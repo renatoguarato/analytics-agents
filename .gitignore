@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+
+# Environment variables and secrets
+.env
+.env.local
+*.env.local
+
+# Google service account credentials
+google-credentials.json
+*-credentials.json
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Runtime / process files
+*.pid
+*.seed
+*.pid.lock
+
+# Node / build caches
+.cache/
+.npm/
+.nyc_output/
+coverage/
+dist/
+build/
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

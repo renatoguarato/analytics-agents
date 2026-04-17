@@ -1,0 +1,18 @@
+{
+  "name": "analytics-agent",
+  "version": "1.0.0",
+  "description": "Agente que coleta dados do Google Analytics e envia resumos via Telegram",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "test-run": "node -e \"import('./index.js').then(m => m)\" "
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.24.0",
+    "@google-analytics/data": "^4.6.0",
+    "dotenv": "^16.4.5",
+    "node-cron": "^3.0.3"
+  }
+}
