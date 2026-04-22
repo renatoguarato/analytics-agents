@@ -51,10 +51,10 @@ export const DIMENSIONS = [
   // { name: 'sessionSource' },     // origem do tráfego
 ];
 
-// Período de coleta: 'today' para dados do dia atual
-// Outros exemplos: 'yesterday', '7daysAgo', '30daysAgo'
+// Período de coleta: últimos 7 dias, incluindo hoje
+// Outros exemplos: 'today', 'yesterday', '30daysAgo'
 export const DATE_RANGE = {
-  startDate: 'today',
+  startDate: '7daysAgo',
   endDate: 'today',
 };
 
