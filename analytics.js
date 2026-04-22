@@ -25,7 +25,7 @@ export async function runAnalyticsReport(site) {
     return buildEmptyMetrics(site.name);
   }
 
-  // Monta um objeto legível para passar ao Claude
+  // Monta um objeto legível para passar ao summarizer
   return formatMetrics(response, site.name);
 }
 

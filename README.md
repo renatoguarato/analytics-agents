@@ -9,7 +9,7 @@ Agente que coleta dados do Google Analytics 4 a cada hora (09h–20h) e envia re
 - Node.js 18+ instalado
 - Conta no Google Cloud com faturamento ativado (API é gratuita dentro dos limites)
 - Bot no Telegram (criado via @BotFather)
-- Conta na Anthropic (para a API do Claude)
+- Conta na Groq (para gerar os resumos)
 
 ---
 
@@ -46,7 +46,7 @@ Agente que coleta dados do Google Analytics 4 a cada hora (09h–20h) e envia re
 
 1. No Analytics, vá em **Admin → Configurações da propriedade**
 2. Copie o **ID da propriedade** (número de 9 dígitos)
-3. No `config.js`, use o formato: `'properties/XXXXXXXXX'`
+3. No `.env`, configure `GA_SITES` usando o formato `"properties/XXXXXXXXX"`
 
 ---
 
@@ -82,7 +82,7 @@ cp .env.example .env
 # 3. Editar o .env com seus valores reais
 # (use qualquer editor de texto)
 
-# 4. Editar o config.js com os seus sites
+# 4. Editar GA_SITES no .env com os seus sites
 ```
 
 ---
@@ -126,9 +126,9 @@ npm start
 analytics-agent/
 ├── index.js              # Agendador principal
 ├── analytics.js          # Coleta dados do GA4
-├── summarizer.js         # Gera resumo via Claude
+├── summarizer.js         # Gera resumo via Groq
 ├── telegram.js           # Envia para o Telegram
-├── config.js             # Seus sites e configurações
+├── config.js             # Lê configurações do .env e define métricas
 ├── google-credentials.json  # Chave da Service Account (NÃO suba pro Git)
 ├── .env                  # Suas variáveis de ambiente (NÃO suba pro Git)
 ├── .env.example          # Modelo do .env (pode subir pro Git)
@@ -158,4 +158,4 @@ analytics-agent/
 → Envie uma mensagem para o bot antes de rodar o agente (o Telegram precisa de uma mensagem inicial).
 
 **Sem dados sendo coletados**
-→ Verifique se o Property ID está no formato `properties/XXXXXXXXX` (com o prefixo).
+→ Verifique se o `propertyId` em `GA_SITES` está no formato `properties/XXXXXXXXX` (com o prefixo).

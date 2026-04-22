@@ -17,7 +17,7 @@ async function runJob() {
       // 1. Busca métricas no Google Analytics
       const metrics = await runAnalyticsReport(site);
 
-      // 2. Gera resumo via Claude
+      // 2. Gera resumo via Groq
       const summary = await generateSummary(site.name, metrics);
 
       // 3. Envia para o Telegram

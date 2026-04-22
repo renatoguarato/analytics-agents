@@ -1,11 +1,23 @@
-// summarizer.js — gera resumo inteligente dos dados via Claude
-// O Claude analisa os números e escreve um parágrafo com insights relevantes
+// summarizer.js — gera resumo inteligente dos dados via Groq
+// O modelo analisa os números e escreve um parágrafo com insights relevantes
 
-import Anthropic from '@anthropic-ai/sdk';
+import Groq from 'groq-sdk';
 
-const client = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
+let client;
+
+function getClient() {
+  if (!process.env.GROQ_API_KEY) {
+    throw new Error('GROQ_API_KEY não definida no .env');
+  }
+
+  if (!client) {
+    client = new Groq({
+      apiKey: process.env.GROQ_API_KEY,
+    });
+  }
+
+  return client;
+}
 
 /**
  * Gera um resumo em linguagem natural a partir das métricas coletadas.
@@ -36,13 +48,13 @@ Linha com insight ou observação
 [linha de alerta se houver problema]
 `;
 
-  const response = await client.messages.create({
-    model: 'claude-opus-4-5',
+  const response = await getClient().chat.completions.create({
+    model: 'llama-3.1-8b-instant',
     max_tokens: 400,
     messages: [
       { role: 'user', content: prompt },
     ],
   });
 
-  return response.content[0].text.trim();
+  return response.choices[0]?.message?.content?.trim() || '';
 }
