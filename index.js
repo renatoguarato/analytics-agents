@@ -6,7 +6,7 @@ import cron from 'node-cron';
 import { runAnalyticsReport } from './analytics.js';
 import { generateSummary } from './summarizer.js';
 import { sendToTelegram } from './telegram.js';
-import { startListener } from './listener.js';
+import { startListener, stopListener } from './listener.js';
 import { SITES } from './config.js';
 
 const HOST = '0.0.0.0';
@@ -50,18 +50,38 @@ function startHealthServer() {
   server.listen(PORT, HOST, () => {
     console.log(`Health server listening on ${HOST}:${PORT}`);
   });
+
+  return server;
 }
 
 // Cron: a cada hora entre 09h e 20h (horário de Brasília)
-cron.schedule('0 9-20 * * *', runJob, {
+const cronTask = cron.schedule('0 9-20 * * *', runJob, {
   timezone: 'America/Sao_Paulo',
 });
 
 // Servidor HTTP mínimo para health check do Render Web Service
-startHealthServer();
+const healthServer = startHealthServer();
 
 // Listener do Telegram — responde a /report, /status, /help
 startListener();
+
+function shutdown(signal) {
+  console.log(`${signal} recebido. Encerrando agente...`);
+  cronTask.stop();
+  stopListener();
+
+  const timeout = setTimeout(() => {
+    process.exit(0);
+  }, 5000);
+
+  healthServer.close(() => {
+    clearTimeout(timeout);
+    process.exit(0);
+  });
+}
+
+process.once('SIGTERM', () => shutdown('SIGTERM'));
+process.once('SIGINT', () => shutdown('SIGINT'));
 
 console.log('Agente iniciado.');
 console.log('  → Cron ativo: execução automática às 09h–20h, a cada hora');

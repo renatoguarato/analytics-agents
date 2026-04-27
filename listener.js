@@ -30,6 +30,8 @@ function getGroqClient() {
 }
 
 let offset = 0;
+let isPolling = false;
+let abortController;
 
 const COMMANDS = {
   '/report': handleReport,
@@ -38,21 +40,38 @@ const COMMANDS = {
 };
 
 export function startListener() {
+  if (isPolling) return;
+
+  isPolling = true;
   console.log('Listener Telegram ativo (texto + áudio). Envie /report ou um áudio no chat.');
   poll();
+}
+
+export function stopListener() {
+  isPolling = false;
+  abortController?.abort();
 }
 
 // ─── Loop de polling ────────────────────────────────────────────────────────
 
 async function poll() {
-  while (true) {
+  while (isPolling) {
     try {
       const updates = await getUpdates();
       for (const update of updates) {
+        if (!isPolling) break;
         offset = update.update_id + 1;
         await handleUpdate(update);
       }
     } catch (err) {
+      if (!isPolling || err.name === 'AbortError') return;
+
+      if (err.code === 409) {
+        console.error('Erro no polling: outra instância do bot está ativa. Aguardando antes de tentar novamente.');
+        await sleep(30000);
+        continue;
+      }
+
       console.error('Erro no polling:', err.message);
       await sleep(5000);
     }
@@ -60,10 +79,19 @@ async function poll() {
 }
 
 async function getUpdates() {
-  const url = `https://api.telegram.org/bot${TOKEN}/getUpdates?offset=${offset}&timeout=30`;
-  const res = await fetch(url);
+  abortController = new AbortController();
+
+  const url = `https://api.telegram.org/bot${TOKEN}/getUpdates?offset=${offset}&timeout=25`;
+  const res = await fetch(url, { signal: abortController.signal });
   const data = await res.json();
-  if (!data.ok) return [];
+  abortController = undefined;
+
+  if (!data.ok) {
+    const err = new Error(data.description || 'Falha ao buscar updates do Telegram');
+    err.code = data.error_code;
+    throw err;
+  }
+
   return data.result || [];
 }
 
